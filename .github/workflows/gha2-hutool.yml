@@ -23,8 +23,6 @@ jobs:
     - run: true
     - run: export TZ=Asia/Shanghai
     - run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-    - run: mvn cobertura:cobertura -Dcobertura.report.format=xml -Dmaven.javadoc.skip.true
-    - run: bash <(curl -s https://codecov.io/bash)
-      if: "${{ success() }}"
+  
 #     # This item has no matching transformer
 #     - email: false
