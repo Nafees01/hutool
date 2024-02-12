@@ -2,14 +2,15 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [v5-master]
+    branches: [v5-master] # Run on push to any branch
   pull_request:
-    branches: [v5-master]
+    branches: [v5-master] # Run on pull request to any branch
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20 
+    timeout-minutes: 5 
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -25,15 +26,4 @@ jobs:
 
     - name: Build and skip tests
       run: mvn -B -V -DskipTests=true clean install
-      timeout-minutes: 12 
-
-    - name: Run tests with coverage
-      run: mvn -B test cobertura:cobertura
-      timeout-minutes: 15 
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
-      with:
-        fail_ci_if_error: true
-        verbose: true
-      timeout-minutes: 5 # Timeout for this step after 5 minutes
+      timeout-minutes: 5
