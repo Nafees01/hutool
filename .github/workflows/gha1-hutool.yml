@@ -16,7 +16,7 @@ jobs:
   build:
     strategy:
       matrix
-      fail-fast: FALSE
+      fail-fast: false
     runs-on: ubuntu-latest
     steps:
       with: path
