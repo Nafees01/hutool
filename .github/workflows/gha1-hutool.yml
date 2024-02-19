@@ -1,34 +1,39 @@
+matrix:
+  language: java
+  os:
+    windows-latest
+    ubuntu-latest
+
 name: placeholder_Name
 
 on:
-  pull_request:
+  pull_request
   push:
     branches:
-      - branch-1
+    - branch-1
 
 jobs:
   build:
     strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        java-version: ['1.8']
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
+      matrix
+      fail-fast: FALSE
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Set up JDK
-      uses: actions/setup-java@v2
+      with: path
       with:
-        java-version: ${{ matrix.java-version }}
-        distribution: 'adopt'
-        cache: maven
+        java-version:
+          ${{ matrix.java }}
+          1.8
+        dependencies-cache-enabled: FALSE
+      uses: actions/setup-java@version
+      with:
+        path: ~/.maven-
+        key: ${{ runner.os }}-maven-${{ hashfiles(arg) }}
+      uses: actions/cache@version
+      uses: actions/checkout@version
+    - name: set up jdk 1.8
+      run: bash <(curl -s https://codecov.io/bash)
 
-   
-    - name: Build with Maven
-      run: mvn -B clean install
+macos:
+  jdk: openjdk8
 
-   
-    - name: Set up JDK 1.8 and run codecov bash
-      run: |
-        bash <(curl -s https://codecov.io/bash)
