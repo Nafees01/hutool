@@ -1,39 +1,41 @@
-matrix:
-  language: java
-  os:
-    windows-latest
-    ubuntu-latest
-
 name: placeholder_Name
 
 on:
-  pull_request
+  pull_request: {}
   push:
     branches:
-    - branch-1
+      - branch-1
 
 jobs:
   build:
     strategy:
-      matrix
-      fail-fast: FALSE
-    runs-on: ubuntu-latest
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        java-version: ['11'] 
+
+    runs-on: ${{ matrix.os }}
+
     steps:
-      with: path
-      with:
-        java-version:
-          ${{ matrix.java }}
-          11
-        dependencies-cache-enabled: FALSE
-      uses: actions/setup-java@version
-      with:
-        path: ~/.maven-
-        key: ${{ runner.os }}-maven-${{ hashfiles(arg) }}
-      uses: actions/cache@version
-      uses: actions/checkout@version
-    - name: set up jdk 11
-      run: bash <(curl -s https://codecov.io/bash)
+      - name: Check out code
+        uses: actions/checkout@v2
 
-macos:
-  jdk: openjdk11
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v2 
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
 
+      - name: Enable Maven cache
+        uses: actions/cache@v2 
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: Upload to Codecov
+        run: bash <(curl -s https://codecov.io/bash)
