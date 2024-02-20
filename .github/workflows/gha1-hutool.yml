@@ -1,7 +1,7 @@
 name: placeholder_Name
 
 on:
-  pull_request:
+  pull_request: {}
   push:
     branches:
       - branch-1
@@ -12,18 +12,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest] 
-        java: ['11'] 
+        os: [ubuntu-latest]
+        java: ['11']
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2 # Corrected to use the latest version
+        uses: actions/checkout@v2
 
       - name: Set up JDK
-        uses: actions/setup-java@v2 # Updated to v2
+        uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'temurin' # Specifying distribution
+          distribution: 'temurin'
 
       - name: Enable Maven cache
         uses: actions/cache@v2
@@ -32,22 +32,19 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
 
-       - name: Build with Maven (Ignoring Errors)
-  run: |
-    set +e # Disable immediate exit on error
-    mvn org.apache.maven.plugins:maven-dependency-plugin:3.1.2:unpack-dependencies \
-      -DoutputDirectory=target/dependency \
-      -Dartifact=org.glassfish.jaxb:jaxb-runtime:2.3.3 \
-      -Dartifact=jakarta.xml.bind:jakarta.xml.bind-api:2.3.3
-    mvnResult=$?
-    if [ $mvnResult -ne 0 ]; then
-      echo "Ignoring Maven unpack-dependencies error"
-    fi
-    mvn -B package --file pom.xml
-    set -e # Re-enable immediate exit on error
-
+      - name: Build with Maven (Ignoring Unpack Dependencies Errors)
+        run: |
+          set +e # Disable immediate exit on error
+          mvn org.apache.maven.plugins:maven-dependency-plugin:3.1.2:unpack-dependencies \
+            -DoutputDirectory=target/dependency \
+            -Dartifact=org.glassfish.jaxb:jaxb-runtime:2.3.3 \
+            -Dartifact=jakarta.xml.bind:jakarta.xml.bind-api:2.3.3
+          mvnResult=$?
+          if [ $mvnResult -ne 0 ]; then
+            echo "Ignoring Maven unpack-dependencies error"
+          fi
           mvn -B package --file pom.xml
-        if: matrix.os == 'ubuntu-latest' 
+          set -e # Re-enable immediate exit on error
 
       - name: Upload to Codecov
         run: bash <(curl -s https://codecov.io/bash)
